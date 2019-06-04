@@ -44,8 +44,8 @@ Parameters:
   KeyPairName:
     Description: EC2 Key Pair Name
     Type: String
-    Default: Candidate-erHQFCQpbf    
-    
+    Default: Candidate-erHQFCQpbf
+
 Mappings:
   AWSInstanceType2Arch:
     t2.micro:
@@ -55,7 +55,7 @@ Mappings:
       Arch: NATHVM64
   AWSRegionArch2AMI:
     us-east-2:
-      HVM64: ami-0ccb28031902cd8cc
+      HVM64: ami-0b57932bcd0762b8c
 
 Resources:
   EC2Instance:
@@ -63,7 +63,7 @@ Resources:
     Properties:
       InstanceType:
         Ref: InstanceType
-      SecurityGroupIds: 
+      SecurityGroupIds:
         - Ref: InstanceSecurityGroup
       SubnetId:
         Ref: SubnetId
