@@ -1,4 +1,4 @@
-![Logo of the project](https://t1.daumcdn.net/cfile/tistory/99DDB3495C5301B030)
+![Logo of the project](/images/Stack.png)
 
 # AWS - JENKINS - ANSIBLE - ELK
 > An ELK installation pipeline using Jenkins on AWS
