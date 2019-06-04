@@ -39,8 +39,11 @@ Kibana Dashboard: http://{publicDNS}:5601
 
 ## Results:
 
-![CloudFormation Success Screenshot](/images/cloud-formation-success.png)<br/>
-![Jenkins Success Screenshot](/images/jenkins-console.png)<br/>
+#### CloudFormation Success
+![CloudFormation Success Screenshot](/images/cloud-formation-success.png)
+#### Jenkins Success
+![Jenkins Success Screenshot](/images/jenkins-console.png)
+#### Kibana Console
 ![Kibana Dashboard Screenshot](/images/kibana-dashboard.png)
 
 
