@@ -33,7 +33,7 @@ Please note that the EC2 instance should atleast be t2.medium as ELK stack requi
 
 ## Post Deployment
 
-Once the deployment is completed, Elasticsearch, Logstash and Kibana applicatipns are installed, configured, and available to use. You can access kibana dashboard using the following URL.
+Once the deployment is completed, Elasticsearch, Logstash and Kibana applications are installed, configured, and available to use. You can access kibana dashboard using the following URL.
 
 Kibana Dashboard: http://{publicDNS}:5601
 
