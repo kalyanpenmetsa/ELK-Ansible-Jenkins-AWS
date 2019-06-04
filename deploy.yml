@@ -1,0 +1,12 @@
+---
+
+- name: Deploying ELK Stack
+  hosts: ELK
+  become: True
+  gather_facts: True
+
+  roles:
+    - java
+    - elasticsearch
+    - logstash
+    - kibana

@@ -1,0 +1,165 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'AWS CloudFormation Template Jenkins-EC2: Create an Jenkins EC2 instance
+  running the Redhat Linux AMI. The AMI is chosen based on the region in which the
+  stack is run. This example creates an EC2 security group for the instance to give
+  you SSH access.'
+
+Parameters:
+  KeyName:
+    Description: Name of an existing EC2 KeyPair to enable SSH access to the instance
+    Type: AWS::EC2::KeyPair::KeyName
+    Default: Candidate-erHQFCQpbf
+  InstanceType:
+    Description: Jenkins EC2 instance
+    Type: String
+    Default: t2.micro
+    AllowedValues:
+    - t2.micro
+    ConstraintDescription: must be a valid EC2 instance type.
+  WebAccessLocation:
+    Description: The IP address range that can be used to access to console port 8080
+    Type: String
+    MinLength: '9'
+    MaxLength: '18'
+    Default: 0.0.0.0/0
+    AllowedPattern: "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})"
+    ConstraintDescription: must be a valid IP CIDR range of the form x.x.x.x/x.
+  SubnetId:
+    Description: Subnet Id of the existing VPC
+    Type: String
+    Default: subnet-0e938696d16c94c73
+  VpcId:
+    Description: VPC Id of the above subnet
+    Type: String
+    Default: vpc-0576130c5f08d7a1f
+  TargetAMIId:
+    Description: ELK RHEL AMI ID
+    Type: String
+    Default: ami-05220ffa0e7fce3d1
+  TargetInstanceSize:
+    Description: Size of the Target ELK Instance
+    Type: String
+    Default: t2.medium
+  KeyPairName:
+    Description: EC2 Key Pair Name
+    Type: String
+    Default: Candidate-erHQFCQpbf    
+    
+Mappings:
+  AWSInstanceType2Arch:
+    t2.micro:
+      Arch: HVM64
+  AWSInstanceType2NATArch:
+    t2.micro:
+      Arch: NATHVM64
+  AWSRegionArch2AMI:
+    us-east-2:
+      HVM64: ami-0ccb28031902cd8cc
+
+Resources:
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType:
+        Ref: InstanceType
+      SecurityGroupIds: 
+        - Ref: InstanceSecurityGroup
+      SubnetId:
+        Ref: SubnetId
+      KeyName:
+        Ref: KeyName
+      IamInstanceProfile:
+        Ref: JenkinsInstanceProfile
+      ImageId:
+        Fn::FindInMap:
+        - AWSRegionArch2AMI
+        - Ref: AWS::Region
+        - Fn::FindInMap:
+          - AWSInstanceType2Arch
+          - Ref: InstanceType
+          - Arch
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          echo "TargetAMIId = ${TargetAMIId}" >> /home/ec2-user/params.txt
+          echo "TargetInstanceSize = ${TargetInstanceSize}" >> /home/ec2-user/params.txt
+          echo "KeyPairName = ${KeyPairName}" >> /home/ec2-user/params.txt
+          echo "SubnetId = ${SubnetId}" >> /home/ec2-user/params.txt
+          echo "InstanceSecurityGroup = ${InstanceSecurityGroup}" >> /home/ec2-user/params.txt
+  JenkinsRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - ec2.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: "/"
+  RolePolicies:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: root
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action: "*"
+          Resource: "*"
+      Roles:
+      - Ref: JenkinsRole
+  JenkinsInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: "/"
+      Roles:
+      - Ref: JenkinsRole
+  InstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable HTTP access via port 8080
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: '8080'
+        ToPort: '8080'
+        CidrIp:
+          Ref: WebAccessLocation
+      - IpProtocol: tcp
+        FromPort: '22'
+        ToPort: '22'
+        CidrIp:
+          Ref: WebAccessLocation
+      - IpProtocol: tcp
+        FromPort: '9200'
+        ToPort: '9200'
+        CidrIp:
+          Ref: WebAccessLocation
+      - IpProtocol: tcp
+        FromPort: '5601'
+        ToPort: '5601'
+        CidrIp:
+          Ref: WebAccessLocation
+      VpcId:
+        Ref: VpcId
+
+Outputs:
+  InstanceId:
+    Description: InstanceId of the newly created EC2 instance
+    Value:
+      Ref: EC2Instance
+  PublicDNS:
+    Description: Public DNSName of the newly created EC2 instance
+    Value:
+      Fn::GetAtt:
+      - EC2Instance
+      - PublicDnsName
+  PublicIP:
+    Description: Public IP address of the newly created EC2 instance
+    Value:
+      Fn::GetAtt:
+      - EC2Instance
+      - PublicIp
