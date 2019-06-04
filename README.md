@@ -1,4 +1,4 @@
-![Logo of the project](/images/Stack.png)
+![Logo of the project](/images/stack.png)
 
 # AWS - JENKINS - ANSIBLE - ELK
 > An ELK installation pipeline using Jenkins on AWS
