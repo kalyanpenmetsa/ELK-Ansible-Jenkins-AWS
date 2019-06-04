@@ -39,7 +39,10 @@ Kibana Dashboard: http://{publicDNS}:5601
 
 ## Results:
 
-![GitHub Logo](/images/jenkins-console.png)
+[CloudFormation Success Screenshot](/images/cloud-formation-success.png)
+[Jenkins Success Screenshot](/images/jenkins-console.png)
+[Kibana Dashboard Screenshot](/images/kibana-dashboard.png)
+
 
 ## Author Information
 
